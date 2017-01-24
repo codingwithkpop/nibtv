@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Nib tv</title>
+        <script
+          src="https://code.jquery.com/jquery-3.1.1.min.js"
+          integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+          crossorigin="anonymous"></script>
+          <style>
+              body {
+                  font-family: Helvetica, sans-serif;
+                  display: flex;
+              }
+              
+              #scores {
+                  flex: 1;
+              }
+              
+              #highlights {
+                  flex: 2;
+              }
+              
+              #highlights div {
+                  width: 100%;
+              }
+              
+              #scores div {
+                  margin: 30px 0;
+              }
+              
+              #scores a {
+                  text-decoration: none;
+              }
+              
+              iframe {
+                  margin: 0 auto;
+                  height: 315px;
+                  width: 100%;
+              }
+              
+              .highlight-title {
+                  font-size: 18px;
+              }
+          </style>
+    </head>
+    <body>
+        <section id="scores"></section>
+        <section id="highlights"></section>
+        
+        <script>
+        
+        updateUI();
+        
+        setInterval(function() {
+            updateScores();
+        }, 60 * 1 * 1000);
+        
+        function updateUI() {
+            updateScores();
+            updateHighlights();
+        }
+        
+        function updateScores() {
+            $.ajax({
+                method: 'get',
+                url: 'scores'
+            }).done(function(res) {
+                var scores = res.scores;
+                var htmlStr = '';
+                
+                for(var i = 0; i < scores.length; i++) {
+                    htmlStr += '<div><a target="_blank" href="http://www.nbaboxscoregenerator.com/?gameID=' + i + '">' + scores[i] + '</a></div>';
+                }
+                
+               $('#scores').html(htmlStr); 
+            });
+        }
+         
+        function updateHighlights() {   
+            $.ajax({
+                method: 'get',
+                url: 'highlights'
+            }).done(function(res) {
+                var htmlStr = '';
+                res.highlights.forEach(function(highlight) {
+                    var h = highlight.href.split('=');
+                    htmlStr += '<div>';
+                    htmlStr += '<p class="highlight-title">' + highlight.title + '</p>';
+                    htmlStr += '<iframe width="560" height="315"frameborder="0" allowfullscreen src="https://www.youtube.com/embed/' + h[h.length - 1] + '"></iframe>';
+                    htmlStr += '</div>';
+                });
+                
+              $('#highlights').html(htmlStr); 
+            });
+        }
+        </script>
+    </body>
+</html>
